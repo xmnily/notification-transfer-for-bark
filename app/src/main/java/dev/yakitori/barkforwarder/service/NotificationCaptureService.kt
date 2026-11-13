@@ -33,6 +33,8 @@ class NotificationCaptureService : NotificationListenerService() {
         val body = (bigText.ifBlank { text }).trim()
         val category = sbn.notification.category ?: extras?.getString("android.template")
         val isGroupSummary = sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY != 0
+        val isOngoing = sbn.isOngoing ||
+            sbn.notification.flags and (Notification.FLAG_ONGOING_EVENT or Notification.FLAG_FOREGROUND_SERVICE) != 0
         val dedupeKeys = NotificationDedupeKeyFactory.forNotification(
             packageName = packageName,
             sourceLabel = sourceLabel,
@@ -61,6 +63,7 @@ class NotificationCaptureService : NotificationListenerService() {
             notificationTag = sbn.tag,
             groupKey = sbn.groupKey,
             isGroupSummary = isGroupSummary,
+            isOngoing = isOngoing,
             imageUrl = NotificationImageExtractor.extractRemoteImageUrl(sbn.notification),
             dedupeKey = dedupeKeys.primaryKey,
             dedupeAliases = dedupeKeys.relatedKeys,

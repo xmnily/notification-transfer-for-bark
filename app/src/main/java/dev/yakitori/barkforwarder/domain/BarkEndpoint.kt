@@ -59,32 +59,17 @@ object BarkEndpointParser {
 
 data class ValidatedBarkSettings(
     val endpoint: BarkEndpoint,
-    val cryptoKey: String,
-    val fixedIv: String,
 )
 
 object BarkSettingsValidator {
     fun validate(
         barkUrlOrKey: String,
-        cryptoKey: String,
-        fixedIv: String,
     ): ValidatedBarkSettings {
         val endpoint = BarkEndpointParser.parse(barkUrlOrKey)
-            ?: throw IllegalArgumentException("Enter a Bark URL or device key.")
-        val normalizedKey = cryptoKey.trim()
-        val normalizedIv = fixedIv.trim()
-
-        requireByteLength(normalizedKey, 32, "Bark AES-256-GCM key must be exactly 32 characters.")
-        requireByteLength(normalizedIv, 12, "Bark GCM IV must be exactly 12 characters.")
+            ?: throw IllegalArgumentException("请输入 Bark 链接或设备 Key。")
 
         return ValidatedBarkSettings(
             endpoint = endpoint,
-            cryptoKey = normalizedKey,
-            fixedIv = normalizedIv,
         )
-    }
-
-    private fun requireByteLength(value: String, expectedBytes: Int, message: String) {
-        require(value.toByteArray(Charsets.UTF_8).size == expectedBytes) { message }
     }
 }

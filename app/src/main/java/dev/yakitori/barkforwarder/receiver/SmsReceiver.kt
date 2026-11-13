@@ -22,7 +22,7 @@ class SmsReceiver : BroadcastReceiver() {
         val event = ForwardEvent(
             type = EventType.SMS,
             packageName = defaultSmsPackage,
-            sourceLabel = "SMS",
+            sourceLabel = "短信",
             title = sender,
             body = body,
             sender = sender,

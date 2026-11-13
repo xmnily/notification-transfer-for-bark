@@ -6,26 +6,42 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class BarkPushClient(private val httpClient: OkHttpClient) {
-    suspend fun sendEncrypted(serverUrl: String, deviceKey: String, ciphertext: String, iv: String) {
-        withContext(Dispatchers.IO) {
-            val body = FormBody.Builder()
-                .add("device_key", deviceKey)
-                .add("ciphertext", ciphertext)
-                .add("iv", iv)
-                .build()
+data class BarkPushResult(
+    val statusCode: Int,
+    val body: String,
+)
 
+class BarkPushClient(private val httpClient: OkHttpClient) {
+    fun formBody(deviceKey: String, payload: BarkPushPayload): FormBody =
+        FormBody.Builder()
+            .add("device_key", deviceKey)
+            .add("title", payload.title)
+            .add("body", payload.body)
+            .add("group", payload.group)
+            .add("level", payload.level)
+            .apply {
+                payload.call?.let { add("call", it.toString()) }
+                payload.icon?.let { add("icon", it) }
+                payload.image?.let { add("image", it) }
+            }
+            .build()
+
+    suspend fun send(serverUrl: String, deviceKey: String, payload: BarkPushPayload): BarkPushResult =
+        withContext(Dispatchers.IO) {
             val request = Request.Builder()
                 .url(serverUrl)
-                .post(body)
+                .post(formBody(deviceKey, payload))
                 .build()
 
             httpClient.newCall(request).execute().use { response ->
-                check(response.isSuccessful) {
-                    "Bark push failed with HTTP ${response.code}"
+                val responseBody = response.body?.string().orEmpty()
+                if (!response.isSuccessful) {
+                    throw IllegalStateException(
+                        "Bark 推送失败，HTTP ${response.code}" +
+                            if (responseBody.isBlank()) "" else "：$responseBody",
+                    )
                 }
+                BarkPushResult(statusCode = response.code, body = responseBody)
             }
         }
-    }
 }
-

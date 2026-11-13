@@ -10,4 +10,7 @@ data class NotificationHistory(
     val renderedBody: String,
     val postedAt: Long,
     val forwardedAt: Long,
+    val log: String = "",
+    val status: HistoryStatus = HistoryStatus.SUCCESS,
+    val filterReason: String = "",
 )

@@ -37,7 +37,7 @@ class NotificationRuleRepository(
         val cleanedBody = NotificationRuleMatcher.cleanPatternInput(bodyPattern)
 
         require(!cleanedTitle.isNullOrBlank() || !cleanedBody.isNullOrBlank()) {
-            "Title or body is required."
+            "标题或正文至少填写一项。"
         }
 
         val rule = NotificationRuleEntity(
@@ -66,7 +66,7 @@ class NotificationRuleRepository(
         val cleanedBody = NotificationRuleMatcher.cleanPatternInput(bodyPattern)
 
         require(!cleanedTitle.isNullOrBlank() || !cleanedBody.isNullOrBlank()) {
-            "Title or body is required."
+            "标题或正文至少填写一项。"
         }
 
         val updated = NotificationRuleEntity(

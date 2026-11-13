@@ -13,15 +13,6 @@ interface NotificationHistoryDao {
     @Insert
     suspend fun insert(entry: NotificationHistoryEntity)
 
-    @Query(
-        """
-        DELETE FROM notification_history
-        WHERE id NOT IN (
-            SELECT id FROM notification_history
-            ORDER BY forwardedAt DESC
-            LIMIT :limit
-        )
-        """,
-    )
-    suspend fun pruneToLatest(limit: Int)
+    @Query("DELETE FROM notification_history")
+    suspend fun deleteAll()
 }

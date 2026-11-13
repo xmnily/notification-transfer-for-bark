@@ -21,6 +21,7 @@ data class ForwardEvent(
     val notificationTag: String? = null,
     val groupKey: String? = null,
     val isGroupSummary: Boolean = false,
+    val isOngoing: Boolean = false,
     val imageUrl: String? = null,
     val iconUrl: String? = null,
     val dedupeKey: String,

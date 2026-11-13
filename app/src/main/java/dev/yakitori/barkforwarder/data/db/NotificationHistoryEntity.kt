@@ -2,6 +2,7 @@ package dev.yakitori.barkforwarder.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import dev.yakitori.barkforwarder.data.model.HistoryStatus
 import dev.yakitori.barkforwarder.data.model.NotificationHistory
 
 @Entity(tableName = "notification_history")
@@ -15,6 +16,9 @@ data class NotificationHistoryEntity(
     val renderedBody: String,
     val postedAt: Long,
     val forwardedAt: Long,
+    val log: String = "",
+    val status: String = HistoryStatus.SUCCESS.name,
+    val filterReason: String = "",
 ) {
     fun toModel(): NotificationHistory {
         return NotificationHistory(
@@ -27,6 +31,9 @@ data class NotificationHistoryEntity(
             renderedBody = renderedBody,
             postedAt = postedAt,
             forwardedAt = forwardedAt,
+            log = log,
+            status = HistoryStatus.fromStored(status),
+            filterReason = filterReason,
         )
     }
 }

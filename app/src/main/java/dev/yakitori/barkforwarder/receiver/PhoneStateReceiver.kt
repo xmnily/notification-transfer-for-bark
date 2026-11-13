@@ -30,8 +30,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
                     ForwardEvent(
                         type = EventType.INCOMING_CALL,
                         packageName = dialerPackage,
-                        sourceLabel = "Phone",
-                        title = "Incoming call",
+                        sourceLabel = "电话",
+                        title = "来电",
                         body = number.orEmpty(),
                         sender = number,
                         phoneNumber = number,
@@ -57,8 +57,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
                         ForwardEvent(
                             type = EventType.MISSED_CALL,
                             packageName = dialerPackage,
-                            sourceLabel = "Phone",
-                            title = "Missed call",
+                            sourceLabel = "电话",
+                            title = "未接来电",
                             body = previousNumber.orEmpty(),
                             sender = previousNumber,
                             phoneNumber = previousNumber,

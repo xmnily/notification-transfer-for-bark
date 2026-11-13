@@ -58,11 +58,13 @@ class AppRuleRepository(
 
     suspend fun updateManualIconUrl(packageName: String, manualIconUrl: String?) {
         val current = dao.getByPackageName(packageName) ?: return
+        val trimmed = manualIconUrl?.trim().takeUnless { it.isNullOrBlank() }
         dao.upsert(
             current.copy(
-                manualIconUrl = manualIconUrl?.trim().takeUnless { it.isNullOrBlank() },
-                cachedResolvedIconUrl = if (manualIconUrl.isNullOrBlank()) current.cachedResolvedIconUrl else manualIconUrl.trim(),
-                iconResolvedAt = System.currentTimeMillis(),
+                manualIconUrl = trimmed,
+                // 缓存里可能存的就是旧的手动 URL，清除时必须一起清掉，否则仍会沿用该图标。
+                cachedResolvedIconUrl = if (trimmed == null) null else current.cachedResolvedIconUrl,
+                iconResolvedAt = if (trimmed == null) null else current.iconResolvedAt,
             ),
         )
     }
@@ -72,7 +74,15 @@ class AppRuleRepository(
         dao.upsert(current.copy(cachedResolvedIconUrl = iconUrl, iconResolvedAt = System.currentTimeMillis()))
     }
 
+    /** 记录一次解析尝试但保留旧缓存，用于失败后的退避重试。 */
+    suspend fun markIconResolutionAttempt(packageName: String) {
+        val current = dao.getByPackageName(packageName) ?: return
+        dao.upsert(current.copy(iconResolvedAt = System.currentTimeMillis()))
+    }
+
     suspend fun getRule(packageName: String): AppRule? = dao.getByPackageName(packageName)?.toModel()
+
+    suspend fun getAllRules(): List<AppRule> = dao.getAll().map { it.toModel() }
 
     fun resolveAppLabel(packageName: String): String {
         return runCatching {

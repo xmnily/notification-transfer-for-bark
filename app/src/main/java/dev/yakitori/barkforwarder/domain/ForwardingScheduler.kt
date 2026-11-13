@@ -6,6 +6,7 @@ import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import dev.yakitori.barkforwarder.data.model.ForwardEvent
 import dev.yakitori.barkforwarder.worker.ForwardDeliveryWorker
@@ -29,6 +30,7 @@ object ForwardingScheduler {
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build(),
             )
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setBackoffCriteria(androidx.work.BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .build()
 
